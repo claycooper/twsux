@@ -2,31 +2,8 @@
 
 import pprint
 import subprocess
-#import statistics
 import json
-
-# Import library and create instance of REST client.
-#from Adafruit_IO import Client, Data
-#aio = Client('XXXXXX')
-
-
-# Get list of feeds.
-#feeds = aio.feeds()
-
-#pp = pprint.PrettyPrinter(indent=4)
-#pp.pprint(feeds)
-
-#print('+-' * 20)
-
-# Print out the feed names:
-#for f in feeds:
-#    print('Feed: {0}'.format(f.name))
-
-#feed = raw_input('Feed Name: ')
-#newvalue = raw_input('Value: ')
-
-#data = Data(value=defrouter)
-#aio.create_data("twc-local-router-ip", data)
+import datetime
 
 
 # mtr --json -c1 8.8.8.8
@@ -39,7 +16,11 @@ traceObj = json.loads(traceStr)
 #json.dumps(trace)
 print(traceObj['report'])
 
+# {'mtr': {'dst': '142.254.217.45', 'tos': '0x0', 'psize': '64', 'bitpattern': '0x00', 'tests': '1', 'src': 'twsux'}, 'hubs': [{'Wrst': 7.42, 'Avg': 7.42, 'Last': 7.42, 'host': 'router1.home.local', 'Best': 7.42, 'count': '1', 'Loss%': 0.0, 'StDev': 0.0, 'Snt': 1}, {'Wrst': 18.07, 'Avg': 18.07, 'Last': 18.07, 'host': '142.254.217.45', 'Best': 18.07, 'count': '2', 'Loss%': 0.0, 'StDev': 0.0, 'Snt': 1}]}
+
+
+print(datetime.datetime.now())
+
 for hub in traceObj['report']['hubs']:
-  print(hub['host'] + "-" + str(hub['Avg']))
-#  print(hub)
+  print(' '.join([ hub['host'], str(hub['Avg']), str(hub['StDev']), str(hub['Loss%']) ]))
 

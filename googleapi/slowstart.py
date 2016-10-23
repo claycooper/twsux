@@ -9,6 +9,11 @@ from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
 
+import pprint
+import subprocess
+import json
+import datetime
+
 try:
     import argparse
     flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
@@ -72,22 +77,38 @@ def main():
     """result = service.spreadsheets().values().get(
         spreadsheetId=spreadsheetId, range=rangeName).execute()
     """
+    trace = subprocess.check_output(['mtr', '--json', '-c1', '142.254.217.45'])
+    traceStr = str(trace, 'utf-8')
+    traceObj = json.loads(traceStr)
+    print(traceObj['report'])
+    print(datetime.datetime.now())
 
-    newvalues = [
-       [ 1, 2 ]
-    ]
+    #newvalues = []
 
-    body = { 'values': newvalues }
+    for hub in traceObj['report']['hubs']:
+    #  print(' '.join([ hub['host'], str(hub['Avg']), str(hub['StDev']), str(hub['Loss%']) ]))
+      newvalues = [[ hub['host'], hub['Avg'], hub['StDev'], hub['Loss%'] ]]
+      result = service.spreadsheets().values().get(
+         spreadsheetId=spreadsheetId, range=rangeName).execute()
 
-    writeResult = service.spreadsheets().values().append(
-        spreadsheetId=spreadsheetId, range=rangeName,
-        valueInputOption=value_input_option, body=body).execute()
+      body = { 'values': newvalues }
 
+      writeResult = service.spreadsheets().values().append(
+         spreadsheetId=spreadsheetId, range=rangeName,
+         valueInputOption=value_input_option, body=body).execute()
+
+
+    #newvalues = [
+    #   [ 1, 2 ]
+    #]
+
+
+    """
     result = service.spreadsheets().values().get(
         spreadsheetId=spreadsheetId, range=rangeName).execute()
 
-    values = result.get('values', [])
 
+    values = result.get('values', [])
     if not values:
         print('No data found.')
     else:
@@ -95,17 +116,8 @@ def main():
         for row in values:
             # Print columns A and E, which correspond to indices 0 and 4.
             print('%s, %s' % (row[0], row[1]))
+    """
 
 
 if __name__ == '__main__':
     main()
-
-import pprint
-import subprocess
-import json
-trace = subprocess.check_output(['mtr', '--json', '-c1', '142.254.217.45'])
-traceStr = str(trace, 'utf-8')
-traceObj = json.loads(traceStr)
-print(traceObj['report'])
-for hub in traceObj['report']['hubs']:
-  print(hub['host'] + "-" + str(hub['Avg']))
