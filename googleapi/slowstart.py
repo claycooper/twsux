@@ -77,17 +77,20 @@ def main():
     """result = service.spreadsheets().values().get(
         spreadsheetId=spreadsheetId, range=rangeName).execute()
     """
-    trace = subprocess.check_output(['mtr', '--json', '-c1', '142.254.217.45'])
+    now = datetime.datetime.now()
+    #trace = subprocess.check_output(['mtr', '--json', '-c1', '142.254.217.45'])
+    trace = subprocess.check_output(['mtr', '--json', '-c10', '8.8.8.8'])
     traceStr = str(trace, 'utf-8')
     traceObj = json.loads(traceStr)
     print(traceObj['report'])
-    print(datetime.datetime.now())
+    print(now)
+
 
     #newvalues = []
 
     for hub in traceObj['report']['hubs']:
     #  print(' '.join([ hub['host'], str(hub['Avg']), str(hub['StDev']), str(hub['Loss%']) ]))
-      newvalues = [[ hub['host'], hub['Avg'], hub['StDev'], hub['Loss%'] ]]
+      newvalues = [[ now.strftime('%Y-%m-%d %H:%M:%S'), hub['host'], hub['Avg'], hub['StDev'], hub['Loss%'] ]]
       result = service.spreadsheets().values().get(
          spreadsheetId=spreadsheetId, range=rangeName).execute()
 
